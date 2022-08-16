@@ -5,7 +5,7 @@ class Model:
     folder = ''            # contain path to image files without name. Same to all files
     images = {}            # key = name of image with extension, value = pil image object
 
-    def add(self, path):
+    def add_image(self, path):
         if path:
             name, self.folder = self._divide_path(path)
             image = Image.open(path)

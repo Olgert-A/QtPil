@@ -27,7 +27,7 @@ class MainWnd(QMainWindow):
         img_list = self.widgets['image_list']
         img_list.clear()
         for path in paths:
-            self.model.add(normpath(path))
+            self.model.add_image(normpath(path))
         img_list.addItems(self.model.get_image_list())
 
     def image_selection_changed(self):
