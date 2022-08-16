@@ -16,7 +16,7 @@ class MainWnd(QMainWindow):
         self.model: Model = model
         self.init_window()
 
-    def image_open_clicked(self):
+    def load_images_clicked(self):
         paths, _ = QFileDialog.getOpenFileNames(self, "Open image", "", "Image Files (*.png *.jpg *.bmp)")
 
         self.model.clear()
@@ -25,11 +25,11 @@ class MainWnd(QMainWindow):
 
     def init_window(self):
         img = self.widgets['image'] = QLabel()
-        btn = self.widgets['load'] = QPushButton('Load next')
-        btn.pressed.connect(self.image_open_clicked)
+        open_images = self.widgets['open_images'] = QPushButton('Open images...')
+        open_images.pressed.connect(self.load_images_clicked)
 
         layout = QVBoxLayout()
-        layout.addWidget(btn)
+        layout.addWidget(open_images)
         layout.addWidget(img)
 
         main_widget = QWidget()
