@@ -12,6 +12,13 @@ class Model:
             if image:
                 self.data[name] = image
 
+    def clear(self):
+        for _, img in self.data.items():
+            img.close()
+
+        self.data.clear()
+        self.folder = ''
+
     @staticmethod
     def _divide_path(path):
         name = path.split('\\')[-1]

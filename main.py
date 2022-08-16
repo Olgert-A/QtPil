@@ -1,21 +1,27 @@
 import sys
 
-from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QLabel, QPushButton
+from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QLabel, QPushButton, QFileDialog
 from PyQt6.QtGui import QPixmap
 
 from PIL import Image
 from PIL.ImageQt import ImageQt
 
+from model import Model
+
 
 class MainWnd(QMainWindow):
-    def __init__(self):
+    def __init__(self, model):
         super().__init__()
         self.widgets = {}
-
+        self.model: Model = model
         self.init_window()
 
     def image_open_clicked(self):
-        self.set_image(self.to_pixmap(Image.open('.\\3.bmp')))
+        paths, _ = QFileDialog.getOpenFileNames(self, "Open image", "", "Image Files (*.png *.jpg *.bmp)")
+
+        self.model.clear()
+        for path in paths:
+            self.model.add(path)
 
     def init_window(self):
         img = self.widgets['image'] = QLabel()
@@ -42,6 +48,8 @@ class MainWnd(QMainWindow):
 
 
 app = QApplication(sys.argv)
-view = MainWnd()
+
+model = Model()
+view = MainWnd(model)
 view.show()
 sys.exit(app.exec())
