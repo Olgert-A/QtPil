@@ -19,6 +19,9 @@ class Model:
         self.data.clear()
         self.folder = ''
 
+    def get_image_list(self):
+        return self.data.keys()
+
     @staticmethod
     def _divide_path(path):
         name = path.split('\\')[-1]
