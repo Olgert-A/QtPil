@@ -23,12 +23,20 @@ class Model:
 
         self.current_image_name = ''
 
+        self.overlay_image = None
+
     def add_image(self, path):
         if path:
             name, self.folder = self._divide_path(path)
             image = Image.open(path)
             if image:
                 self.images[name] = ImageItem(image, None)
+
+    def load_overlay_image(self, path):
+        if path:
+            image = Image.open(path)
+            if image:
+                self.overlay_image = image
 
     def clear(self):
         for _, img in self.images.items():
@@ -53,10 +61,10 @@ class Model:
         if self.current_image_name:
             image_item = self.images[self.current_image_name]
             blender = image_item.image.copy()
-            if coord := image_item.coord:
-                draw = ImageDraw.Draw(blender)
-                draw.line((0, coord.y, blender.width, coord.y))
-                draw.line((coord.x, 0, coord.x, blender.height))
+            if (coord := image_item.coord) and (oi := self.overlay_image):
+                x = int(coord.x - oi.width / 2)
+                y = int(coord.y - oi.height / 2)
+                blender.paste(self.overlay_image, (x, y))
 
             return blender
 

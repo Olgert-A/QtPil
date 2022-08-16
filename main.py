@@ -30,6 +30,12 @@ class MainWnd(QMainWindow):
             self.model.add_image(normpath(path))
         img_list.addItems(self.model.get_image_list())
 
+    def load_overlay_clicked(self):
+        path, _ = QFileDialog.getOpenFileName(self, "Open overlay image", "", "Image Files (*.png *.jpg *.bmp)")
+
+        if path:
+            self.model.load_overlay_image(path)
+
     def image_selection_changed(self):
         img_list = self.widgets['image_list']
 
@@ -54,9 +60,11 @@ class MainWnd(QMainWindow):
     def init_window(self):
         img = self.widgets['image'] = QLabel()
         open_images = self.widgets['open_images'] = QPushButton('Open images...')
+        open_overlay_image = self.widgets['open_overlay_image'] = QPushButton('Open overlay image...')
         img_list = self.widgets['image_list'] = QListWidget()
 
         open_images.pressed.connect(self.load_images_clicked)
+        open_overlay_image.pressed.connect(self.load_overlay_clicked)
         img_list.itemSelectionChanged.connect(self.image_selection_changed)
 
         self.setMinimumSize(600, 400)
@@ -69,6 +77,7 @@ class MainWnd(QMainWindow):
         editor.addWidget(img)
 
         controls = QVBoxLayout()
+        controls.addWidget(open_overlay_image)
         controls.addWidget(open_images)
         controls.addWidget(img_list)
 
