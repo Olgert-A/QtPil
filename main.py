@@ -35,7 +35,8 @@ class MainWnd(QMainWindow):
 
         if items := img_list.selectedItems():
             image_name = items[0].text()
-            image = self.model.get_image(image_name)
+            self.model.set_current_image(image_name)
+            image = self.model.get_current_blend()
             if image:
                 self.set_pixmap(self.to_pixmap(image))
         else:
@@ -45,7 +46,10 @@ class MainWnd(QMainWindow):
         global_click_pos = e.pos()
         image = self.widgets['image']
         image_click_pos = global_click_pos - image.pos()
-        print(image_click_pos)
+        self.model.set_current_coord(image_click_pos.x(), image_click_pos.y())
+        image = self.model.get_current_blend()
+        if image:
+            self.set_pixmap(self.to_pixmap(image))
 
     def init_window(self):
         img = self.widgets['image'] = QLabel()
