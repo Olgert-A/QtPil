@@ -23,7 +23,9 @@ class MainWnd(QMainWindow):
         paths, _ = QFileDialog.getOpenFileNames(self, "Open image", "", "Image Files (*.png *.jpg *.bmp)")
 
         self.model.clear()
-        (img_list := self.widgets['image_list']).clear()
+        
+        img_list = self.widgets['image_list']
+        img_list.clear()
         for path in paths:
             self.model.add(normpath(path))
         img_list.addItems(self.model.get_image_list())
@@ -68,7 +70,9 @@ class MainWnd(QMainWindow):
 
     def set_image(self, image: QPixmap):
         if image:
-            self.widgets['image'].setPixmap(image)
+            img = self.widgets['image']
+            img.setPixmap(image)
+            img.resize(image.width(), image.height())
 
     @staticmethod
     def to_pixmap(image: Image) -> QPixmap:
