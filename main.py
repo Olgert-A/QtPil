@@ -23,7 +23,7 @@ class MainWnd(QMainWindow):
         paths, _ = QFileDialog.getOpenFileNames(self, "Open image", "", "Image Files (*.png *.jpg *.bmp)")
 
         self.model.clear()
-
+        self.set_pixmap(QPixmap(None))
         img_list = self.widgets['image_list']
         img_list.clear()
         for path in paths:
@@ -37,7 +37,9 @@ class MainWnd(QMainWindow):
             image_name = items[0].text()
             image = self.model.get_image(image_name)
             if image:
-                self.set_image(self.to_pixmap(image))
+                self.set_pixmap(self.to_pixmap(image))
+        else:
+            self.set_pixmap(QPixmap(None))
 
     def mousePressEvent(self, e):
         global_click_pos = e.pos()
@@ -74,11 +76,11 @@ class MainWnd(QMainWindow):
         main_widget.setLayout(main_layout)
         self.setCentralWidget(main_widget)
 
-    def set_image(self, image: QPixmap):
-        if image:
+    def set_pixmap(self, pixmap: QPixmap):
+        if pixmap:
             img = self.widgets['image']
-            img.setPixmap(image)
-            img.resize(image.width(), image.height())
+            img.setPixmap(pixmap)
+            img.resize(pixmap.width(), pixmap.height())
 
     @staticmethod
     def to_pixmap(image: Image) -> QPixmap:
