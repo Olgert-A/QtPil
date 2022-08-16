@@ -1,6 +1,8 @@
 import sys
+from os.path import normpath
 
-from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QLabel, QPushButton, QFileDialog
+from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, \
+    QLabel, QPushButton, QFileDialog, QListWidget
 from PyQt6.QtGui import QPixmap
 
 from PIL import Image
@@ -20,16 +22,31 @@ class MainWnd(QMainWindow):
         paths, _ = QFileDialog.getOpenFileNames(self, "Open image", "", "Image Files (*.png *.jpg *.bmp)")
 
         self.model.clear()
+        (img_list := self.widgets['image_list']).clear()
         for path in paths:
-            self.model.add(path)
+            self.model.add(normpath(path))
+        img_list.addItems(self.model.get_image_list())
+
+    def image_selection_changed(self):
+        img_list = self.widgets['image_list']
+
+        if items := img_list.selectedItems():
+            image_name = items[0].text()
+            image = self.model.get_image(image_name)
+            if image:
+                self.set_image(self.to_pixmap(image))
 
     def init_window(self):
         img = self.widgets['image'] = QLabel()
         open_images = self.widgets['open_images'] = QPushButton('Open images...')
+        img_list = self.widgets['image_list'] = QListWidget()
+
         open_images.pressed.connect(self.load_images_clicked)
+        img_list.itemSelectionChanged.connect(self.image_selection_changed)
 
         layout = QVBoxLayout()
         layout.addWidget(open_images)
+        layout.addWidget(img_list)
         layout.addWidget(img)
 
         main_widget = QWidget()
