@@ -1,9 +1,10 @@
 import sys
 from os.path import normpath
 
-from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, \
+from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, \
     QLabel, QPushButton, QFileDialog, QListWidget
 from PyQt6.QtGui import QPixmap
+from PyQt6.QtCore import Qt
 
 from PIL import Image
 from PIL.ImageQt import ImageQt
@@ -44,13 +45,25 @@ class MainWnd(QMainWindow):
         open_images.pressed.connect(self.load_images_clicked)
         img_list.itemSelectionChanged.connect(self.image_selection_changed)
 
-        layout = QVBoxLayout()
-        layout.addWidget(open_images)
-        layout.addWidget(img_list)
-        layout.addWidget(img)
+        self.setMinimumSize(600, 400)
+        controls_width = 200
+        img.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
+        open_images.setFixedWidth(controls_width)
+        img_list.setFixedWidth(controls_width)
+
+        editor = QVBoxLayout()
+        editor.addWidget(img)
+
+        controls = QVBoxLayout()
+        controls.addWidget(open_images)
+        controls.addWidget(img_list)
+
+        main_layout = QHBoxLayout()
+        main_layout.addLayout(editor)
+        main_layout.addLayout(controls)
 
         main_widget = QWidget()
-        main_widget.setLayout(layout)
+        main_widget.setLayout(main_layout)
         self.setCentralWidget(main_widget)
 
     def set_image(self, image: QPixmap):
