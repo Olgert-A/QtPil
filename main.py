@@ -23,7 +23,7 @@ class MainWnd(QMainWindow):
         paths, _ = QFileDialog.getOpenFileNames(self, "Open image", "", "Image Files (*.png *.jpg *.bmp)")
 
         self.model.clear()
-        
+
         img_list = self.widgets['image_list']
         img_list.clear()
         for path in paths:
@@ -38,6 +38,12 @@ class MainWnd(QMainWindow):
             image = self.model.get_image(image_name)
             if image:
                 self.set_image(self.to_pixmap(image))
+
+    def mousePressEvent(self, e):
+        global_click_pos = e.pos()
+        image = self.widgets['image']
+        image_click_pos = global_click_pos - image.pos()
+        print(image_click_pos)
 
     def init_window(self):
         img = self.widgets['image'] = QLabel()
