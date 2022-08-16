@@ -3,24 +3,27 @@ from PIL import Image
 
 class Model:
     folder = ''            # contain path to image files without name. Same to all files
-    data = {}              # key = name of image with extension, value = pil image object
+    images = {}            # key = name of image with extension, value = pil image object
 
     def add(self, path):
         if path:
             name, self.folder = self._divide_path(path)
             image = Image.open(path)
             if image:
-                self.data[name] = image
+                self.images[name] = image
 
     def clear(self):
-        for _, img in self.data.items():
+        for _, img in self.images.items():
             img.close()
 
-        self.data.clear()
+        self.images.clear()
         self.folder = ''
 
+    def get_image(self, name):
+        return self.images.get(name)
+
     def get_image_list(self):
-        return self.data.keys()
+        return self.images.keys()
 
     @staticmethod
     def _divide_path(path):
