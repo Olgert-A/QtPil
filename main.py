@@ -80,7 +80,7 @@ class MainWnd(QMainWindow):
         if pixmap:
             img = self.widgets['image']
             img.setPixmap(pixmap)
-            img.resize(pixmap.width(), pixmap.height())
+            img.setFixedSize(pixmap.width(), pixmap.height())
 
     @staticmethod
     def to_pixmap(image: Image) -> QPixmap:
