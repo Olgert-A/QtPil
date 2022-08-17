@@ -54,7 +54,6 @@ class Model:
 
     def set_current_coord(self, x, y):
         if self.current_image_name:
-            print('set coord')
             self.images[self.current_image_name].coord = Coord(x, y)
 
     def get_current_blend(self):
