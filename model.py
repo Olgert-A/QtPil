@@ -39,8 +39,8 @@ class Model:
                 self.overlay_image = image
 
     def clear(self):
-        for _, img in self.images.items():
-            img.close()
+        for _, item in self.images.items():
+            item.image.close()
 
         self.images.clear()
         self.folder = ''
