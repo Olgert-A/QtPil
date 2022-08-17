@@ -46,7 +46,7 @@ class MainWnd(QMainWindow):
             if image:
                 self.set_pixmap(self.to_pixmap(image))
         else:
-            self.set_pixmap(QPixmap(None))
+            self.set_pixmap()
 
     def mousePressEvent(self, e):
         global_click_pos = e.pos()
@@ -89,11 +89,13 @@ class MainWnd(QMainWindow):
         main_widget.setLayout(main_layout)
         self.setCentralWidget(main_widget)
 
-    def set_pixmap(self, pixmap: QPixmap):
+    def set_pixmap(self, pixmap: QPixmap = None):
+        img: QLabel = self.widgets['image']
         if pixmap:
-            img = self.widgets['image']
             img.setPixmap(pixmap)
             img.setFixedSize(pixmap.width(), pixmap.height())
+        else:
+            img.clear()
 
     @staticmethod
     def to_pixmap(image: Image) -> QPixmap:
