@@ -70,10 +70,10 @@ class Model:
         if name in self.images.keys():
             image_item = self.images[name]
             blender = image_item.image.copy()
-            if (coord := image_item.coord) and (oi := self.overlay.image):
-                x = int(coord.x - oi.width / 2)
-                y = int(coord.y - oi.height / 2)
-                blender.paste(oi, (x, y), oi.convert('RGBA'))
+            if (coord := image_item.coord) and (overlay := self.overlay):
+                x = int(coord.x - overlay.image.width / 2)
+                y = int(coord.y - overlay.image.height / 2)
+                blender.paste(overlay.image, (x, y), overlay.image.convert('RGBA'))
             return blender
 
     @staticmethod
