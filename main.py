@@ -74,7 +74,7 @@ class MainWnd(QMainWindow):
         self.model.set_current_coord(image_click_pos.x(), image_click_pos.y())
         image = self.model.get_current_blend()
         if image:
-            self.set_pixmap(self.to_pixmap(image))
+            self.show_image(self.to_pixmap(image))
 
     # ============ SIGNALS ========================
     def load_overlay_clicked(self):
@@ -82,18 +82,19 @@ class MainWnd(QMainWindow):
 
         if path:
             self.model.load_overlay_image(path)
-            self.widgets['overlay_image'].setText(path)
+            self.show_overlay_image_path(path)
 
     def load_images_clicked(self):
         paths, _ = QFileDialog.getOpenFileNames(self, "Open image", "", "Image Files (*.png *.jpg *.bmp)")
-
+        
         self.model.clear()
-        self.set_pixmap(QPixmap(None))
-        img_list = self.widgets['image_list']
-        img_list.clear()
+        self.show_image()
+
         for path in paths:
             self.model.add_image(normpath(path))
-        img_list.addItems(self.model.get_image_list())
+
+        image_list = self.model.get_image_list()
+        self.show_image_list(image_list)
 
     def image_selection_changed(self):
         img_list = self.widgets['image_list']
@@ -103,19 +104,28 @@ class MainWnd(QMainWindow):
             self.model.set_current_image(image_name)
             image = self.model.get_current_blend()
             if image:
-                self.set_pixmap(self.to_pixmap(image))
+                self.show_image(self.to_pixmap(image))
         else:
-            self.set_pixmap()
+            self.show_image()
 
     # ============ VIEW UPDATE ========================
-
-    def set_pixmap(self, pixmap: QPixmap = None):
+    def show_image(self, pixmap: QPixmap = None):
         img: QLabel = self.widgets['image']
         if pixmap:
             img.setPixmap(pixmap)
             img.setFixedSize(pixmap.width(), pixmap.height())
         else:
             img.clear()
+
+    def show_overlay_image_path(self, path):
+        self.widgets['overlay_image'].setText(path)
+
+    def show_image_list(self, image_list):
+        img_list = self.widgets['image_list']
+        img_list.clear()
+        img_list.addItems(image_list)
+        if img_list.count() > 0:
+            img_list.setCurrentRow(0)
 
     @staticmethod
     def to_pixmap(image: Image) -> QPixmap:
