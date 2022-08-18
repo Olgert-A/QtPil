@@ -1,5 +1,5 @@
 import sys
-from os.path import normpath
+
 
 from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, \
     QLabel, QPushButton, QFileDialog, QListWidget, QLineEdit
@@ -9,14 +9,15 @@ from PyQt6.QtCore import Qt
 from PIL import Image
 from PIL.ImageQt import ImageQt
 
-from model import Model
+from model.contract import ModelContract
+from model.impl import ModelImpl
 
 
 class MainWnd(QMainWindow):
-    def __init__(self, model):
+    def __init__(self, model_impl: ModelContract):
         super().__init__()
         self.widgets = {}
-        self.model: Model = model
+        self.model: ModelContract = model_impl
         self.init_window()
 
     # ============ WINDOW CREATION METHODS ==========
@@ -72,7 +73,7 @@ class MainWnd(QMainWindow):
         image = self.widgets['image']
         image_click_pos = global_click_pos - image.pos()
         self.model.set_current_coord(image_click_pos.x(), image_click_pos.y())
-        image = self.model.get_current_blend()
+        image = self.model.get_current_blended()
         if image:
             self.show_image(self.to_pixmap(image))
 
@@ -86,15 +87,14 @@ class MainWnd(QMainWindow):
 
     def load_images_clicked(self):
         paths, _ = QFileDialog.getOpenFileNames(self, "Open image", "", "Image Files (*.png *.jpg *.bmp)")
-        
-        self.model.clear()
-        self.show_image()
 
-        for path in paths:
-            self.model.add_image(normpath(path))
+        if paths:
+            self.model.clear_image_list()
+            self.show_image()
 
-        image_list = self.model.get_image_list()
-        self.show_image_list(image_list)
+            self.model.load_image_list(paths)
+            image_list = self.model.get_image_list()
+            self.show_image_list(image_list)
 
     def image_selection_changed(self):
         img_list = self.widgets['image_list']
@@ -102,7 +102,7 @@ class MainWnd(QMainWindow):
         if items := img_list.selectedItems():
             image_name = items[0].text()
             self.model.set_current_image(image_name)
-            image = self.model.get_current_blend()
+            image = self.model.get_current_blended()
             if image:
                 self.show_image(self.to_pixmap(image))
         else:
@@ -136,7 +136,7 @@ class MainWnd(QMainWindow):
 
 app = QApplication(sys.argv)
 
-model = Model()
+model = ModelImpl()
 view = MainWnd(model)
 view.show()
 sys.exit(app.exec())
