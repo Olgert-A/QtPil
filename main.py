@@ -2,7 +2,7 @@ import sys
 from os.path import normpath
 
 from PyQt6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, \
-    QLabel, QPushButton, QFileDialog, QListWidget
+    QLabel, QPushButton, QFileDialog, QListWidget, QLineEdit
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt
 
@@ -35,6 +35,7 @@ class MainWnd(QMainWindow):
 
         if path:
             self.model.load_overlay_image(path)
+            self.widgets['overlay_image'].setText(path)
 
     def image_selection_changed(self):
         img_list = self.widgets['image_list']
@@ -60,16 +61,20 @@ class MainWnd(QMainWindow):
     def init_window(self):
         img = self.widgets['image'] = QLabel()
         open_images = self.widgets['open_images'] = QPushButton('Open images...')
+        overlay_image = self.widgets['overlay_image'] = QLineEdit()
         open_overlay_image = self.widgets['open_overlay_image'] = QPushButton('Open overlay image...')
         img_list = self.widgets['image_list'] = QListWidget()
 
         open_images.pressed.connect(self.load_images_clicked)
+        overlay_image.setReadOnly(True)
         open_overlay_image.pressed.connect(self.load_overlay_clicked)
         img_list.itemSelectionChanged.connect(self.image_selection_changed)
 
         self.setMinimumSize(600, 400)
         controls_width = 200
         img.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
+        overlay_image.setFixedWidth(controls_width)
+        open_overlay_image.setFixedWidth(controls_width)
         open_images.setFixedWidth(controls_width)
         img_list.setFixedWidth(controls_width)
 
@@ -77,6 +82,7 @@ class MainWnd(QMainWindow):
         editor.addWidget(img)
 
         controls = QVBoxLayout()
+        controls.addWidget(overlay_image)
         controls.addWidget(open_overlay_image)
         controls.addWidget(open_images)
         controls.addWidget(img_list)
