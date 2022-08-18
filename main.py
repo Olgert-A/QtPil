@@ -19,45 +19,7 @@ class MainWnd(QMainWindow):
         self.model: Model = model
         self.init_window()
 
-    def load_images_clicked(self):
-        paths, _ = QFileDialog.getOpenFileNames(self, "Open image", "", "Image Files (*.png *.jpg *.bmp)")
-
-        self.model.clear()
-        self.set_pixmap(QPixmap(None))
-        img_list = self.widgets['image_list']
-        img_list.clear()
-        for path in paths:
-            self.model.add_image(normpath(path))
-        img_list.addItems(self.model.get_image_list())
-
-    def load_overlay_clicked(self):
-        path, _ = QFileDialog.getOpenFileName(self, "Open overlay image", "", "Image Files (*.png *.jpg *.bmp)")
-
-        if path:
-            self.model.load_overlay_image(path)
-            self.widgets['overlay_image'].setText(path)
-
-    def image_selection_changed(self):
-        img_list = self.widgets['image_list']
-
-        if items := img_list.selectedItems():
-            image_name = items[0].text()
-            self.model.set_current_image(image_name)
-            image = self.model.get_current_blend()
-            if image:
-                self.set_pixmap(self.to_pixmap(image))
-        else:
-            self.set_pixmap()
-
-    def mousePressEvent(self, e):
-        global_click_pos = e.pos()
-        image = self.widgets['image']
-        image_click_pos = global_click_pos - image.pos()
-        self.model.set_current_coord(image_click_pos.x(), image_click_pos.y())
-        image = self.model.get_current_blend()
-        if image:
-            self.set_pixmap(self.to_pixmap(image))
-
+    # ============ WINDOW CREATION METHODS ==========
     def init_window(self):
         self.create_widgets()
         self.set_signals()
@@ -103,6 +65,49 @@ class MainWnd(QMainWindow):
         main_widget = QWidget()
         main_widget.setLayout(main_layout)
         self.setCentralWidget(main_widget)
+
+    # ============ EVENTS =========================
+    def mousePressEvent(self, e):
+        global_click_pos = e.pos()
+        image = self.widgets['image']
+        image_click_pos = global_click_pos - image.pos()
+        self.model.set_current_coord(image_click_pos.x(), image_click_pos.y())
+        image = self.model.get_current_blend()
+        if image:
+            self.set_pixmap(self.to_pixmap(image))
+
+    # ============ SIGNALS ========================
+    def load_overlay_clicked(self):
+        path, _ = QFileDialog.getOpenFileName(self, "Open overlay image", "", "Image Files (*.png *.jpg *.bmp)")
+
+        if path:
+            self.model.load_overlay_image(path)
+            self.widgets['overlay_image'].setText(path)
+
+    def load_images_clicked(self):
+        paths, _ = QFileDialog.getOpenFileNames(self, "Open image", "", "Image Files (*.png *.jpg *.bmp)")
+
+        self.model.clear()
+        self.set_pixmap(QPixmap(None))
+        img_list = self.widgets['image_list']
+        img_list.clear()
+        for path in paths:
+            self.model.add_image(normpath(path))
+        img_list.addItems(self.model.get_image_list())
+
+    def image_selection_changed(self):
+        img_list = self.widgets['image_list']
+
+        if items := img_list.selectedItems():
+            image_name = items[0].text()
+            self.model.set_current_image(image_name)
+            image = self.model.get_current_blend()
+            if image:
+                self.set_pixmap(self.to_pixmap(image))
+        else:
+            self.set_pixmap()
+
+    # ============ VIEW UPDATE ========================
 
     def set_pixmap(self, pixmap: QPixmap = None):
         img: QLabel = self.widgets['image']
