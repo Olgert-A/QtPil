@@ -22,6 +22,7 @@ class OverlayImage:
     def __init__(self, image: Image):
         self.image = image
         self.transparency = 100
+        self.resize = 100
 
 
 class ModelImpl(ModelContract):
@@ -36,6 +37,10 @@ class ModelImpl(ModelContract):
             image = Image.open(path)
             if image:
                 self.overlay = OverlayImage(image)
+
+    def resize_overlay_image(self, percent):
+        if self.overlay:
+            self.overlay.resize = percent
 
     def close_overlay_image(self):
         if self.overlay and (image := self.overlay.image):
@@ -80,9 +85,12 @@ class ModelImpl(ModelContract):
             image_item = self.images[name]
             blender = image_item.image.copy()
             if (coord := image_item.coord) and (overlay := self.overlay):
-                x = int(coord.x - overlay.image.width / 2)
-                y = int(coord.y - overlay.image.height / 2)
-                blender.paste(overlay.image, (x, y), overlay.image.convert('RGBA'))
+                new_size = (int(overlay.image.width * overlay.resize / 100),
+                            int(overlay.image.height * overlay.resize / 100))
+                resized = overlay.image.copy().resize(new_size)
+                x = int(coord.x - resized.width / 2)
+                y = int(coord.y - resized.height / 2)
+                blender.paste(resized, (x, y), resized.convert('RGBA'))
             return blender
 
     @staticmethod

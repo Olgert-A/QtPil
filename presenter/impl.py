@@ -22,6 +22,10 @@ class MainPresenterImpl(MainPresenterContract):
             self.model.load_overlay_image(path)
             self.view.show_overlay_image_path(path)
 
+    def resize_overlay_image(self, percent):
+        self.model.resize_overlay_image(percent)
+        self._show_blended()
+
     def load_image_list(self, paths):
         if paths:
             self.model.clear_image_list()
@@ -31,19 +35,23 @@ class MainPresenterImpl(MainPresenterContract):
 
     def set_current_image(self, name):
         self.model.set_current_image(name)
-        if blended := self.model.get_current_blended():
-            self.view.show_image(self._to_pixmap(blended))
+        self._show_blended()
 
     def set_current_coord(self, x, y):
         self.model.set_current_coord(x, y)
-        if blended := self.model.get_current_blended():
-            self.view.show_image(self._to_pixmap(blended))
+        self._show_blended()
 
     def save_all(self, path=''):
         pass
+
+    def _show_blended(self):
+        if blended := self.model.get_current_blended():
+            self.view.show_image(self._to_pixmap(blended))
 
     @staticmethod
     def _to_pixmap(image: Image) -> QPixmap:
         img1 = ImageQt(image)
         img2 = img1.copy()
         return QPixmap.fromImage(img2)
+
+

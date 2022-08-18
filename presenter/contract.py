@@ -14,6 +14,11 @@ class MainPresenterContract(ABC):
         pass
 
     @abstractmethod
+    def resize_overlay_image(self, percent):
+        """set resize percent to overlay image"""
+        pass
+
+    @abstractmethod
     def load_image_list(self, paths):
         """load images to edit using paths"""
         pass

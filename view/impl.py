@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, \
-    QLabel, QPushButton, QFileDialog, QListWidget, QLineEdit
+    QLabel, QPushButton, QFileDialog, QListWidget, QLineEdit, QSlider
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt
 
@@ -10,6 +10,7 @@ from presenter.contract import MainPresenterContract
 class MainViewMeta(type(QMainWindow), type(MainViewContract)):
     # solve metaclass conflict with PyQt
     pass
+
 
 class ImageSize:
     def __init__(self, width, height):
@@ -37,12 +38,14 @@ class MainViewImpl(QMainWindow, MainViewContract, metaclass=MainViewMeta):
         self.widgets['image'] = QLabel()
         self.widgets['overlay_image'] = QLineEdit()
         self.widgets['open_overlay_image'] = QPushButton('Open overlay image...')
+        w = self.widgets['overlay_resize'] = QSlider(Qt.Orientation.Horizontal)
         self.widgets['open_images'] = QPushButton('Open images...')
         self.widgets['image_list'] = QListWidget()
 
     def set_signals(self):
         self.widgets['overlay_image'].setReadOnly(True)
         self.widgets['open_overlay_image'].pressed.connect(self.load_overlay_clicked)
+        self.widgets['overlay_resize'].valueChanged.connect(self.overlay_resize_change)
         self.widgets['open_images'].pressed.connect(self.load_images_clicked)
         self.widgets['image_list'].itemSelectionChanged.connect(self.image_selection_changed)
 
@@ -52,6 +55,10 @@ class MainViewImpl(QMainWindow, MainViewContract, metaclass=MainViewMeta):
         self.widgets['image'].setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
         self.widgets['overlay_image'].setFixedWidth(controls_width)
         self.widgets['open_overlay_image'].setFixedWidth(controls_width)
+        self.widgets['overlay_resize'].setFixedWidth(controls_width)
+        self.widgets['overlay_resize'].setMaximum(100)
+        self.widgets['overlay_resize'].setMinimum(1)
+        self.widgets['overlay_resize'].setValue(100)
         self.widgets['open_images'].setFixedWidth(controls_width)
         self.widgets['image_list'].setFixedWidth(controls_width)
 
@@ -62,6 +69,7 @@ class MainViewImpl(QMainWindow, MainViewContract, metaclass=MainViewMeta):
         controls = QVBoxLayout()
         controls.addWidget(self.widgets['overlay_image'])
         controls.addWidget(self.widgets['open_overlay_image'])
+        controls.addWidget(self.widgets['overlay_resize'])
         controls.addWidget(self.widgets['open_images'])
         controls.addWidget(self.widgets['image_list'])
 
@@ -89,6 +97,9 @@ class MainViewImpl(QMainWindow, MainViewContract, metaclass=MainViewMeta):
     def load_overlay_clicked(self):
         path, _ = QFileDialog.getOpenFileName(self, "Open overlay image", "", "Image Files (*.png *.jpg *.bmp)")
         self.presenter.load_overlay_image(path)
+
+    def overlay_resize_change(self, value):
+        self.presenter.resize_overlay_image(value)
 
     def load_images_clicked(self):
         paths, _ = QFileDialog.getOpenFileNames(self, "Open image", "", "Image Files (*.png *.jpg *.bmp)")

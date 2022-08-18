@@ -8,6 +8,11 @@ class ModelContract(ABC):
         pass
 
     @abstractmethod
+    def resize_overlay_image(self, percent):
+        """set resize percent to overlay image"""
+        pass
+
+    @abstractmethod
     def close_overlay_image(self):
         """close overlay image"""
         pass
