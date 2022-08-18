@@ -3,23 +3,27 @@ from PyQt6.QtWidgets import QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, \
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt
 
-from PIL import Image
-from PIL.ImageQt import ImageQt
-
-from model.contract import ModelContract
 from view.contract import MainViewContract
+from presenter.contract import MainPresenterContract
 
 
 class MainViewMeta(type(QMainWindow), type(MainViewContract)):
     # solve metaclass conflict with PyQt
     pass
 
+class ImageSize:
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+
 
 class MainViewImpl(QMainWindow, MainViewContract, metaclass=MainViewMeta):
-    def __init__(self, model_impl: ModelContract):
+    def __init__(self, presenter: MainPresenterContract):
         super().__init__()
         self.widgets = {}
-        self.model: ModelContract = model_impl
+        self.image_size = ImageSize(0, 0)
+        self.presenter = presenter
+        self.presenter.attach_view(self)
         self.init_window()
 
     # ============ WINDOW CREATION METHODS ==========
@@ -72,41 +76,27 @@ class MainViewImpl(QMainWindow, MainViewContract, metaclass=MainViewMeta):
     # ============ EVENTS =========================
     def mousePressEvent(self, e):
         global_click_pos = e.pos()
-        image = self.widgets['image']
-        image_click_pos = global_click_pos - image.pos()
-        self.model.set_current_coord(image_click_pos.x(), image_click_pos.y())
-        image = self.model.get_current_blended()
-        if image:
-            self.show_image(self.to_pixmap(image))
+        w: QLabel = self.widgets['image']
+        widget_click_pos = global_click_pos - w.pos()
+        width_delta = (w.size().width() - self.image_size.width) / 2
+        height_delta = (w.size().height() - self.image_size.height) / 2
+        x = int(widget_click_pos.x() - width_delta)
+        y = int(widget_click_pos.y() - height_delta)
+        print(f"{x} {y}")
+        self.presenter.set_current_coord(x, y)
 
     # ============ SIGNALS ========================
     def load_overlay_clicked(self):
         path, _ = QFileDialog.getOpenFileName(self, "Open overlay image", "", "Image Files (*.png *.jpg *.bmp)")
-
-        if path:
-            self.model.load_overlay_image(path)
-            self.show_overlay_image_path(path)
+        self.presenter.load_overlay_image(path)
 
     def load_images_clicked(self):
         paths, _ = QFileDialog.getOpenFileNames(self, "Open image", "", "Image Files (*.png *.jpg *.bmp)")
-
-        if paths:
-            self.model.clear_image_list()
-            self.show_image()
-
-            self.model.load_image_list(paths)
-            image_list = self.model.get_image_list()
-            self.show_image_list(image_list)
+        self.presenter.load_image_list(paths)
 
     def image_selection_changed(self):
-        img_list = self.widgets['image_list']
-
-        if items := img_list.selectedItems():
-            image_name = items[0].text()
-            self.model.set_current_image(image_name)
-            image = self.model.get_current_blended()
-            if image:
-                self.show_image(self.to_pixmap(image))
+        if items := self.widgets['image_list'].selectedItems():
+            self.presenter.set_current_image(items[0].text())
         else:
             self.show_image()
 
@@ -114,9 +104,10 @@ class MainViewImpl(QMainWindow, MainViewContract, metaclass=MainViewMeta):
     def show_image(self, pixmap: QPixmap = None):
         img: QLabel = self.widgets['image']
         if pixmap:
+            self.image_size = ImageSize(pixmap.width(), pixmap.height())
             img.setPixmap(pixmap)
-            img.setFixedSize(pixmap.width(), pixmap.height())
         else:
+            self.image_size = ImageSize(0, 0)
             img.clear()
 
     def show_overlay_image_path(self, path):
@@ -128,9 +119,3 @@ class MainViewImpl(QMainWindow, MainViewContract, metaclass=MainViewMeta):
         img_list.addItems(image_list)
         if img_list.count() > 0:
             img_list.setCurrentRow(0)
-
-    @staticmethod
-    def to_pixmap(image: Image) -> QPixmap:
-        img1 = ImageQt(image)
-        img2 = img1.copy()
-        return QPixmap.fromImage(img2)
