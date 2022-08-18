@@ -22,7 +22,7 @@ class OverlayImage:
         self.transparency = 100
 
 
-class Model:
+class ModelImpl:
     def __init__(self):
         self.folder = ''            # contain path to image files without name. Same to all files
         self.images = {}            # key = name of image with extension, value = pil image object
