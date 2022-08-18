@@ -16,6 +16,12 @@ class ImageItem:
         self.coord = coord
 
 
+class OverlayImage:
+    def __init__(self, image: Image):
+        self.image = image
+        self.transparency = 100
+
+
 class Model:
     def __init__(self):
         self.folder = ''            # contain path to image files without name. Same to all files
@@ -23,7 +29,7 @@ class Model:
 
         self.current_image_name = ''
 
-        self.overlay_image = None
+        self.overlay = None
 
     def add_image(self, path):
         if path:
@@ -36,7 +42,7 @@ class Model:
         if path:
             image = Image.open(path)
             if image:
-                self.overlay_image = image
+                self.overlay = OverlayImage(image)
 
     def clear(self):
         for _, item in self.images.items():
@@ -58,13 +64,16 @@ class Model:
 
     def get_current_blend(self):
         if self.current_image_name:
-            image_item = self.images[self.current_image_name]
+            return self._blend_image(self.current_image_name)
+
+    def _blend_image(self, name):
+        if name in self.images.keys():
+            image_item = self.images[name]
             blender = image_item.image.copy()
-            if (coord := image_item.coord) and (oi := self.overlay_image):
+            if (coord := image_item.coord) and (oi := self.overlay.image):
                 x = int(coord.x - oi.width / 2)
                 y = int(coord.y - oi.height / 2)
-                blender.paste(self.overlay_image, (x, y))
-
+                blender.paste(oi, (x, y), oi.convert('RGBA'))
             return blender
 
     @staticmethod
