@@ -90,8 +90,9 @@ class MainViewImpl(QMainWindow, MainViewContract, metaclass=MainViewMeta):
         height_delta = (w.size().height() - self.image_size.height) / 2
         x = int(widget_click_pos.x() - width_delta)
         y = int(widget_click_pos.y() - height_delta)
-        print(f"{x} {y}")
-        self.presenter.set_current_coord(x, y)
+
+        if 0 <= x <= self.image_size.width and 0 <= y <= self.image_size.height:
+            self.presenter.set_current_coord(x, y)
 
     # ============ SIGNALS ========================
     def load_overlay_clicked(self):
