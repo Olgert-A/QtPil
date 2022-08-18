@@ -59,33 +59,42 @@ class MainWnd(QMainWindow):
             self.set_pixmap(self.to_pixmap(image))
 
     def init_window(self):
-        img = self.widgets['image'] = QLabel()
-        open_images = self.widgets['open_images'] = QPushButton('Open images...')
-        overlay_image = self.widgets['overlay_image'] = QLineEdit()
-        open_overlay_image = self.widgets['open_overlay_image'] = QPushButton('Open overlay image...')
-        img_list = self.widgets['image_list'] = QListWidget()
+        self.create_widgets()
+        self.set_signals()
+        self.set_sizes()
+        self.place_widgets()
 
-        open_images.pressed.connect(self.load_images_clicked)
-        overlay_image.setReadOnly(True)
-        open_overlay_image.pressed.connect(self.load_overlay_clicked)
-        img_list.itemSelectionChanged.connect(self.image_selection_changed)
+    def create_widgets(self):
+        self.widgets['image'] = QLabel()
+        self.widgets['overlay_image'] = QLineEdit()
+        self.widgets['open_overlay_image'] = QPushButton('Open overlay image...')
+        self.widgets['open_images'] = QPushButton('Open images...')
+        self.widgets['image_list'] = QListWidget()
 
-        self.setMinimumSize(600, 400)
+    def set_signals(self):
+        self.widgets['overlay_image'].setReadOnly(True)
+        self.widgets['open_overlay_image'].pressed.connect(self.load_overlay_clicked)
+        self.widgets['open_images'].pressed.connect(self.load_images_clicked)
+        self.widgets['image_list'].itemSelectionChanged.connect(self.image_selection_changed)
+
+    def set_sizes(self):
         controls_width = 200
-        img.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
-        overlay_image.setFixedWidth(controls_width)
-        open_overlay_image.setFixedWidth(controls_width)
-        open_images.setFixedWidth(controls_width)
-        img_list.setFixedWidth(controls_width)
+        self.setMinimumSize(600, 400)
+        self.widgets['image'].setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
+        self.widgets['overlay_image'].setFixedWidth(controls_width)
+        self.widgets['open_overlay_image'].setFixedWidth(controls_width)
+        self.widgets['open_images'].setFixedWidth(controls_width)
+        self.widgets['image_list'].setFixedWidth(controls_width)
 
+    def place_widgets(self):
         editor = QVBoxLayout()
-        editor.addWidget(img)
+        editor.addWidget(self.widgets['image'])
 
         controls = QVBoxLayout()
-        controls.addWidget(overlay_image)
-        controls.addWidget(open_overlay_image)
-        controls.addWidget(open_images)
-        controls.addWidget(img_list)
+        controls.addWidget(self.widgets['overlay_image'])
+        controls.addWidget(self.widgets['open_overlay_image'])
+        controls.addWidget(self.widgets['open_images'])
+        controls.addWidget(self.widgets['image_list'])
 
         main_layout = QHBoxLayout()
         main_layout.addLayout(editor)
