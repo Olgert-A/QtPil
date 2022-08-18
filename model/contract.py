@@ -8,27 +8,32 @@ class ModelContract(ABC):
         pass
 
     @abstractmethod
-    def close_overlay_image(self, path):
+    def close_overlay_image(self):
         """close overlay image"""
         pass
 
     @abstractmethod
-    def load_image_list(self, image_paths):
+    def load_image_list(self, paths):
         """load editing images to model"""
         pass
 
     @abstractmethod
-    def clear_image_list(self, image_paths):
+    def get_image_list(self, only_names=True):
+        """get list of opened images names if only_names = True else get list of full image paths"""
+        pass
+
+    @abstractmethod
+    def clear_image_list(self):
         """close all opened images and clear list"""
         pass
 
     @abstractmethod
-    def set_current_image(self, image_name):
+    def set_current_image(self, name):
         """set current editing image to model"""
         pass
 
     @abstractmethod
-    def set_current_coord(self, coord):
+    def set_current_coord(self, x, y):
         """set new overlay coordinates to current image"""
         pass
 
